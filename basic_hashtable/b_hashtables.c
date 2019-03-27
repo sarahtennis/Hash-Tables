@@ -121,6 +121,18 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
  ****/
 void hash_table_remove(BasicHashTable *ht, char *key)
 {
+  // hash key
+  unsigned int removeHash = hash(key, ht->capacity);
+
+  // check if key exists in ht
+  if (ht->storage[removeHash])
+  {
+    // free Pair (and strings)
+    destroy_pair(ht->storage[removeHash]);
+
+    // point to 0 (consistent with calloc)
+    ht->storage[removeHash] = 0;
+  }
 }
 
 /****
@@ -130,21 +142,26 @@ void hash_table_remove(BasicHashTable *ht, char *key)
  ****/
 char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
-  return NULL;
+  unsigned int checkHash = hash(key, ht->capacity);
+
+  if (ht->storage[checkHash])
+  {
+    return ht->storage[checkHash]->value;
+  }
+  else
+  {
+    return NULL;
+  }
 }
+
+// BasicHashTable *ht = malloc(sizeof(BasicHashTable));
+// ht->capacity = capacity;
+// ht->storage = (Pair *)calloc(capacity, sizeof(Pair *));
 
 /****
   Fill this in.
 
   Don't forget to free any malloc'ed memory!
-
-  // initialize instance of BasicHashTable
-  BasicHashTable *ht = malloc(sizeof(BasicHashTable));
-  // set capacity to input value (allocated space part of BasicHashTable instance)
-  ht->capacity = capacity;
-  // allocate space for pair storage (space for pairs created elsewhere)
-  ht->storage = (Pair *)calloc(capacity, sizeof(Pair *));
-
  ****/
 void destroy_hash_table(BasicHashTable *ht)
 {
@@ -171,18 +188,18 @@ int main(void)
 
   hash_table_insert(ht, "line", "Here today...\n");
 
-  // printf("%s", hash_table_retrieve(ht, "line"));
+  printf("%s", hash_table_retrieve(ht, "line"));
 
-  // hash_table_remove(ht, "line");
+  hash_table_remove(ht, "line");
 
-  // if (hash_table_retrieve(ht, "line") == NULL)
-  // {
-  //   printf("...gone tomorrow. (success)\n");
-  // }
-  // else
-  // {
-  //   fprintf(stderr, "ERROR: STILL HERE\n");
-  // }
+  if (hash_table_retrieve(ht, "line") == NULL)
+  {
+    printf("...gone tomorrow. (success)\n");
+  }
+  else
+  {
+    fprintf(stderr, "ERROR: STILL HERE\n");
+  }
 
   destroy_hash_table(ht);
 
