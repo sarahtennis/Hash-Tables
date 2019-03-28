@@ -183,6 +183,27 @@ void hash_table_remove(HashTable *ht, char *key)
  */
 char *hash_table_retrieve(HashTable *ht, char *key)
 {
+  // hash key
+  unsigned int hashIndex = hash(key, ht->capacity);
+
+  // if something at index
+  if (ht->storage[hashIndex])
+  {
+    LinkedPair *current = ht->storage[hashIndex];
+
+    while (current)
+    {
+      if (strcmp(current->key, key) == 0)
+      {
+        return current->value;
+      }
+      else
+      {
+        current = current->next;
+      }
+    }
+  }
+
   return NULL;
 }
 
