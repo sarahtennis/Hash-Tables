@@ -102,10 +102,19 @@ void hash_table_insert(BasicHashTable *ht, char *key, char *value)
   // create new Pair object
   Pair *newPair = create_pair(key, value);
 
-  // if something already at key value, error msg
+  // hold current pair at hash
+  Pair *current = ht->storage[newKey];
+
+  // if something already at key value
   if (ht->storage[newKey])
   {
-    fprintf(stderr, "Overwriting value at %d", newKey);
+    // if different key at same hash
+    if (strcmp(key, current->key) != 0)
+    {
+      fprintf(stderr, "Overwriting key/value: %s/%s", current->key, current->value);
+    }
+    // remove pair at hash index
+    destroy_pair(current);
   }
 
   // write new pair to hashed key
@@ -125,13 +134,17 @@ void hash_table_remove(BasicHashTable *ht, char *key)
   unsigned int removeHash = hash(key, ht->capacity);
 
   // check if key exists in ht
-  if (ht->storage[removeHash])
+  if (ht->storage[removeHash] && strcmp(key, ht->storage[removeHash]->key) == 0)
   {
     // free Pair (and strings)
     destroy_pair(ht->storage[removeHash]);
 
     // point to 0 (consistent with calloc)
     ht->storage[removeHash] = 0;
+  }
+  else
+  {
+    fprintf(stderr, "Cannot remove key: %s", key);
   }
 }
 
@@ -144,7 +157,7 @@ char *hash_table_retrieve(BasicHashTable *ht, char *key)
 {
   unsigned int checkHash = hash(key, ht->capacity);
 
-  if (ht->storage[checkHash])
+  if (ht->storage[checkHash] && strcmp(key, ht->storage[checkHash]->key) == 0)
   {
     return ht->storage[checkHash]->value;
   }
