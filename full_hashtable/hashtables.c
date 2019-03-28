@@ -296,7 +296,26 @@ void destroy_hash_table(HashTable *ht)
  */
 HashTable *hash_table_resize(HashTable *ht)
 {
-  HashTable *new_ht;
+  // new capacity
+  int newCapacity = ht->capacity * 2;
+
+  // create new ht
+  HashTable *new_ht = create_hash_table(newCapacity);
+
+  // iterate through all current values
+  for (int x = 0; x < ht->capacity; x++)
+  {
+    // if something exists at index
+    LinkedPair *current = ht->storage[x];
+    while (current)
+    {
+      // iterate over linked lists at index
+      hash_table_insert(new_ht, current->key, current->value);
+      current = current->next;
+    }
+  }
+
+  destroy_hash_table(ht);
 
   return new_ht;
 }
