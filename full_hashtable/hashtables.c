@@ -159,8 +159,9 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
     } while (current);
   }
+}
 
-  /*
+/*
   Fill this in.
 
   Should search the entire list of LinkedPairs for existing
@@ -168,11 +169,11 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  */
-  void hash_table_remove(HashTable * ht, char *key)
-  {
-  }
+void hash_table_remove(HashTable *ht, char *key)
+{
+}
 
-  /*
+/*
   Fill this in.
 
   Should search the entire list of LinkedPairs for existing
@@ -180,21 +181,52 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   Return NULL if the key is not found.
  */
-  char *hash_table_retrieve(HashTable * ht, char *key)
-  {
-    return NULL;
-  }
+char *hash_table_retrieve(HashTable *ht, char *key)
+{
+  return NULL;
+}
 
-  /*
+// delete all: INDEX 1: A->B->C->NULL
+
+/*
   Fill this in.
 
   Don't forget to free any malloc'ed memory!
  */
-  void destroy_hash_table(HashTable * ht)
+void destroy_hash_table(HashTable *ht)
+{
+  // loop through all indices in capacity
+  for (int x = 0; x < ht->capacity; x++)
   {
+    // if not NULL at index
+    if (ht->storage[x])
+    {
+      LinkedPair *temp = ht->storage[x];
+      LinkedPair *next = temp->next;
+      while (temp)
+      {
+        if (next)
+        {
+          free(temp);
+          temp = next;
+          next = next->next;
+        }
+        else
+        {
+          free(temp);
+          temp = NULL;
+        };
+      };
+    };
   }
 
-  /*
+  free(ht->storage);
+
+  // free entire data type
+  free(ht);
+}
+
+/*
   Fill this in.
 
   Should create a new hash table with double the capacity
@@ -202,34 +234,34 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
 
   Don't forget to free any malloc'ed memory!
  */
-  HashTable *hash_table_resize(HashTable * ht)
-  {
-    HashTable *new_ht;
+HashTable *hash_table_resize(HashTable *ht)
+{
+  HashTable *new_ht;
 
-    return new_ht;
-  }
+  return new_ht;
+}
 
 #ifndef TESTING
-  int main(void)
-  {
-    struct HashTable *ht = create_hash_table(2);
+int main(void)
+{
+  struct HashTable *ht = create_hash_table(2);
 
-    hash_table_insert(ht, "line_1", "Tiny hash table\n");
-    hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
-    hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
+  hash_table_insert(ht, "line_1", "Tiny hash table\n");
+  hash_table_insert(ht, "line_2", "Filled beyond capacity\n");
+  hash_table_insert(ht, "line_3", "Linked list saves the day!\n");
 
-    printf("%s", hash_table_retrieve(ht, "line_1"));
-    printf("%s", hash_table_retrieve(ht, "line_2"));
-    printf("%s", hash_table_retrieve(ht, "line_3"));
+  printf("%s", hash_table_retrieve(ht, "line_1"));
+  printf("%s", hash_table_retrieve(ht, "line_2"));
+  printf("%s", hash_table_retrieve(ht, "line_3"));
 
-    int old_capacity = ht->capacity;
-    ht = hash_table_resize(ht);
-    int new_capacity = ht->capacity;
+  // int old_capacity = ht->capacity;
+  // ht = hash_table_resize(ht);
+  // int new_capacity = ht->capacity;
 
-    printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
+  // printf("\nResizing hash table from %d to %d.\n", old_capacity, new_capacity);
 
-    destroy_hash_table(ht);
+  destroy_hash_table(ht);
 
-    return 0;
-  }
+  return 0;
+}
 #endif
