@@ -117,34 +117,36 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
   else
   {
     // if not empty, either replace or add to linked list
-    // insert B: A->B->C
+    // insert B: A->B->C->NULL
+    // insert D: A->B->C->NULL
     LinkedPair *previous = NULL;
-    LinkedPair *current = ht->storage[hashIndex];
+    LinkedPair *current = ht->storage[hashIndex]; // initially head of linked list at hashIndex
 
-    do
+    while (current)
     {
       // key of current pair is same as parameter key
       if (strcmp(current->key, key) == 0)
       {
-        // no previous, first/only in linked list
+        // no previous, first/only in linked list and matching key -- REPLACE, FIX POST
         if (!previous)
         {
-          ht->storage[hashIndex] = newPair;
           newPair->next = current->next;
+          ht->storage[hashIndex] = newPair;
           destroy_pair(current);
         }
         else
         {
-          // not first/only element
-          ht->storage[hashIndex] = newPair;
+          // not first/only element and matching key -- REPLACE, FIX PRE/POST
           previous->next = newPair;
           newPair->next = current->next;
           destroy_pair(current);
         }
+
         break;
       }
-      else
+      else // keys do not match
       {
+        // if there is another in linked list
         if (current->next)
         {
           previous = current;
@@ -156,8 +158,7 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
           break;
         }
       }
-
-    } while (current);
+    };
   }
 }
 
@@ -171,6 +172,44 @@ void hash_table_insert(HashTable *ht, char *key, char *value)
  */
 void hash_table_remove(HashTable *ht, char *key)
 {
+  // hash key
+  unsigned int hashIndex = hash(key, ht->capacity);
+
+  if (ht->storage[hashIndex])
+  {
+    LinkedPair *previous = NULL;
+    LinkedPair *current = ht->storage[hashIndex];
+
+    while (current)
+    {
+      if (strcmp(current->key, key) == 0)
+      {
+        if (previous)
+        {
+          previous->next = current->next;
+          destroy_pair(current);
+        }
+        else
+        {
+          ht->storage[hashIndex] = current->next;
+          destroy_pair(current);
+        }
+      }
+      else
+      {
+        if (current->next)
+        {
+          previous = current;
+          current = current->next;
+        }
+        else
+        {
+          fprintf(stderr, "Key '%s' does not exist in hash table", key);
+          current = NULL;
+        }
+      }
+    }
+  }
 }
 
 /*
